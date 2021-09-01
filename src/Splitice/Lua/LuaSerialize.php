@@ -8,7 +8,7 @@ class LuaSerialize
 		return (bool)count(array_filter(array_keys($array), 'is_string')) && array_keys($array) !== range(0, count($array) - 1);
 	}
 
-	function serialize($value)
+	function serialize($value, $strict = false)
 	{
 		if (is_object($value)) {
 			$value = (array)$value;
@@ -17,11 +17,11 @@ class LuaSerialize
 			$members = array();
 			if (self::is_assoc($value)) {
 				foreach ($value as $k => $v) {
-					$members[] = '[' . $this->serialize($k) .']=' . $this->serialize($v);
+					if($v !== null) $members[] = '[' . $this->serialize($k, $strict) .']=' . $this->serialize($v, $strict);
 				}
 			} else {
 				foreach ($value as $k => $v) {
-					$members[] = $this->serialize($v);
+					$members[] = $this->serialize($v, $strict);
 				}
 			}
 			return '{'.implode(',', $members).'}';
